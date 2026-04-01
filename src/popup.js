@@ -22,6 +22,9 @@ let isRunning = false;
 let flowConfiguration = null;
 let flowDataItems = null;
 let flowStartUrl = null;
+let flowAlwaysNavigate = true;
+let flowOnError = "stop";
+let flowRetryFallback = "skip";
 
 // ── Init ─────────────────────────────────────────────────────────
 
@@ -64,7 +67,12 @@ chrome.runtime.onMessage.addListener((msg) => {
   }
 
   if (msg.type === "FLOW_PROGRESS") {
-    updateProgress(msg.current, msg.total, msg.phase);
+    updateProgress(msg.current, msg.total, msg.phase, msg.skipped);
+    if (msg.phase === "skipped" && msg.detail) {
+      log("warn", msg.detail);
+    } else if (msg.phase === "retrying" && msg.detail) {
+      log("info", msg.detail);
+    }
   }
 
   if (msg.type === "FLOW_RESULT") {
@@ -72,11 +80,16 @@ chrome.runtime.onMessage.addListener((msg) => {
     hideProgress();
     clearLog();
     if (msg.stopped) {
-      log("warn", `Stopped. Completed ${msg.completed || 0}/${msg.total || "?"} requests.`);
+      const parts = [`Stopped. ${msg.completed || 0} completed`];
+      if (msg.skipped) parts.push(`${msg.skipped} skipped`);
+      parts.push(`out of ${msg.total || "?"}`);
+      log("warn", parts.join(", ") + ".");
     } else if (msg.ok) {
       log("ok", msg.message || `All ${msg.completed} requests completed.`);
     } else {
-      log("err", msg.error || "Flow failed.");
+      const parts = [msg.error || "Flow failed."];
+      if (msg.skipped) parts.push(`(${msg.skipped} skipped)`);
+      log("err", parts.join(" "));
     }
   }
 });
@@ -108,6 +121,9 @@ function resetState() {
   flowConfiguration = null;
   flowDataItems = null;
   flowStartUrl = null;
+  flowAlwaysNavigate = true;
+  flowOnError = "stop";
+  flowRetryFallback = "skip";
   runBtn.disabled = true;
   preview.classList.add("hidden");
   hideProgress();
@@ -174,6 +190,9 @@ function handleUploadedJson(raw, fileName) {
       flowConfiguration = configs;
       flowDataItems = dataArr;
       flowStartUrl = raw.startUrl || null;
+      flowAlwaysNavigate = raw.alwaysNavigate !== false;
+      flowOnError = raw.onError || "stop";
+      flowRetryFallback = raw.retryFallback || "skip";
       parsedPayload = null;
       selectedFieldConfigs = null;
     }
@@ -308,6 +327,9 @@ function loadSelectedFlow() {
 
     flowConfiguration = mergedConfigs;
     flowStartUrl = flow.startUrl || null;
+    flowAlwaysNavigate = flow.alwaysNavigate !== false;
+    flowOnError = flow.onError || "stop";
+    flowRetryFallback = flow.retryFallback || "skip";
     flowDataItems = null;
     parsedPayload = null;
     selectedFieldConfigs = null;
@@ -338,6 +360,9 @@ flowDataFile.addEventListener("change", (e) => {
       } else if (raw.data && Array.isArray(raw.data)) {
         items = raw.data;
         if (raw.startUrl && !flowStartUrl) flowStartUrl = raw.startUrl;
+        if (raw.alwaysNavigate !== undefined) flowAlwaysNavigate = raw.alwaysNavigate !== false;
+        if (raw.onError) flowOnError = raw.onError;
+        if (raw.retryFallback) flowRetryFallback = raw.retryFallback;
         if (raw.configuration && Array.isArray(raw.configuration)) {
           flowConfiguration = raw.configuration.filter((f) => f.enabled !== false);
         }
@@ -398,6 +423,9 @@ runBtn.addEventListener("click", () => {
       configuration: flowConfiguration,
       data: flowDataItems,
       startUrl: flowStartUrl || null,
+      alwaysNavigate: flowAlwaysNavigate,
+      onError: flowOnError,
+      retryFallback: flowRetryFallback,
     };
 
     chrome.runtime.sendMessage(msg, (response) => {
@@ -454,17 +482,21 @@ function showProgress(current, total) {
   updateProgress(current, total);
 }
 
-function updateProgress(current, total, phase) {
+function updateProgress(current, total, phase, skipped) {
   progressDisplay.classList.remove("hidden");
+  const skipSuffix = skipped ? `, ${skipped} skipped` : "";
   if (phase === "running") {
-    const completed = current;
-    const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+    const pct = total > 0 ? Math.round((current / total) * 100) : 0;
     progressBar.style.width = `${pct}%`;
-    progressText.textContent = `Running request ${current + 1} of ${total}  (${completed} done)`;
+    progressText.textContent = `Running request ${current + 1} of ${total}  (${current} done${skipSuffix})`;
+  } else if (phase === "skipped" || phase === "retrying") {
+    const pct = total > 0 ? Math.round((current / total) * 100) : 0;
+    progressBar.style.width = `${pct}%`;
+    progressText.textContent = phase === "retrying" ? `Retrying request ${current + 1} of ${total}` : `Skipped request ${current + 1}${skipSuffix}`;
   } else {
     const pct = total > 0 ? Math.round((current / total) * 100) : 0;
     progressBar.style.width = `${pct}%`;
-    progressText.textContent = `Completed ${current}/${total}`;
+    progressText.textContent = `Completed ${current}/${total}${skipSuffix}`;
   }
 }
 

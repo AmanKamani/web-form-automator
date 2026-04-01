@@ -104,6 +104,32 @@
           <h3>Start URL</h3>
           <p class="hint">The page to navigate to before each request in a batch (e.g. the "New Request" page URL).</p>
           <input type="text" id="flowStartUrl" placeholder="https://mycompany.service-now.com/sp?id=sc_cat_item&sys_id=...">
+          <label class="flow-toggle" title="When ON, navigates to Start URL before every request including the first. When OFF, skips navigation for the first request (assumes you're already on the page).">
+            <input type="checkbox" id="flowAlwaysNavigate" checked>
+            Always navigate to Start URL (including first request)
+          </label>
+        </section>
+
+        <section class="editor-section">
+          <h3>Error Handling</h3>
+          <p class="hint">What to do when a request fails during a batch run.</p>
+          <div class="flow-settings-grid">
+            <div>
+              <label for="flowOnError">On Error</label>
+              <select id="flowOnError">
+                <option value="stop">Stop entire batch</option>
+                <option value="skip">Skip and continue</option>
+                <option value="retry">Retry once, then...</option>
+              </select>
+            </div>
+            <div id="retryFallbackGroup" class="hidden">
+              <label for="flowRetryFallback">After retry fails</label>
+              <select id="flowRetryFallback">
+                <option value="skip">Skip to next</option>
+                <option value="stop">Stop batch</option>
+              </select>
+            </div>
+          </div>
         </section>
 
         <section class="editor-section">

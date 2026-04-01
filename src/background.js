@@ -19,7 +19,11 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
 
   if (msg.type === "RUN_FLOW") {
-    runFlow(msg.configuration, msg.data, msg.startUrl)
+    runFlow(msg.configuration, msg.data, msg.startUrl, {
+      alwaysNavigate: msg.alwaysNavigate !== false,
+      onError: msg.onError || "stop",
+      retryFallback: msg.retryFallback || "skip",
+    })
       .then((res) => sendResponse(res))
       .catch((err) => sendResponse({ ok: false, error: err.message }));
     return true;
@@ -90,11 +94,12 @@ async function runOnActiveTab(payload, templateFieldConfigs) {
 
 // ── Flow / batch runner ──────────────────────────────────────────
 
-async function runFlow(configuration, dataItems, startUrl) {
+async function runFlow(configuration, dataItems, startUrl, opts = {}) {
   if (!Array.isArray(dataItems) || dataItems.length === 0) {
     throw new Error("No data items to process.");
   }
 
+  const { alwaysNavigate = true, onError = "stop", retryFallback = "skip" } = opts;
   const fieldConfigs = configuration.filter((f) => f.enabled !== false);
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab) throw new Error("No active tab found");
@@ -104,6 +109,22 @@ async function runFlow(configuration, dataItems, startUrl) {
 
   runningTabId = tab.id;
   runningFlowState = { current: 0, total: dataItems.length, aborted: false };
+  let completed = 0;
+  let skipped = 0;
+
+  async function navigateAndInject() {
+    if (startUrl) {
+      await navigateAndWait(tab.id, startUrl);
+    }
+    await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      files: ["src/selectors.js", "src/content-script.js"],
+    });
+  }
+
+  async function runItem(index) {
+    return await runSingleItem(tab.id, fieldConfigs, dataItems[index]);
+  }
 
   try {
     for (let i = 0; i < dataItems.length; i++) {
@@ -112,48 +133,89 @@ async function runFlow(configuration, dataItems, startUrl) {
       }
 
       runningFlowState.current = i;
-      broadcastProgress(i, dataItems.length, "running");
+      broadcastProgress(i, dataItems.length, "running", skipped);
 
-      // Navigate to startUrl for items after the first
-      if (i > 0 && startUrl) {
+      // Navigation logic
+      const shouldNavigate = (i === 0 && alwaysNavigate) || i > 0;
+      if (shouldNavigate && startUrl) {
         await navigateAndWait(tab.id, startUrl);
       } else if (i > 0 && !startUrl) {
         const result = {
           ok: false,
           error: `No start URL configured. Batch stopped after item ${i}/${dataItems.length}.`,
-          completed: i,
-          total: dataItems.length,
+          completed, skipped, total: dataItems.length,
         };
         broadcastFlowResult(result);
         return result;
       }
 
-      // Inject content scripts (fresh context after navigation)
       await chrome.scripting.executeScript({
         target: { tabId: tab.id },
         files: ["src/selectors.js", "src/content-script.js"],
       });
 
-      // Run automation for this data item
-      const itemResult = await runSingleItem(tab.id, fieldConfigs, dataItems[i]);
+      let itemResult = await runItem(i);
 
       if (itemResult.stopped) {
-        const result = { ok: false, stopped: true, error: "Automation stopped by user.", completed: i, total: dataItems.length };
+        const result = { ok: false, stopped: true, error: "Automation stopped by user.", completed, skipped, total: dataItems.length };
         broadcastFlowResult(result);
         return result;
       }
 
       if (!itemResult.ok) {
-        const result = { ok: false, error: `Item ${i + 1} failed: ${itemResult.error}`, completed: i, total: dataItems.length };
-        broadcastFlowResult(result);
-        return result;
+        // ── Error handling strategies ──
+        if (onError === "stop") {
+          const result = { ok: false, error: `Item ${i + 1} failed: ${itemResult.error}`, completed, skipped, total: dataItems.length };
+          broadcastFlowResult(result);
+          return result;
+        }
+
+        if (onError === "skip") {
+          skipped++;
+          broadcastProgress(i, dataItems.length, "skipped", skipped, `Item ${i + 1} failed — skipped: ${itemResult.error}`);
+          continue;
+        }
+
+        if (onError === "retry") {
+          broadcastProgress(i, dataItems.length, "retrying", skipped, `Item ${i + 1} failed — retrying...`);
+
+          if (startUrl) await navigateAndWait(tab.id, startUrl);
+          await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ["src/selectors.js", "src/content-script.js"],
+          });
+
+          const retryResult = await runItem(i);
+
+          if (retryResult.stopped) {
+            const result = { ok: false, stopped: true, error: "Automation stopped by user.", completed, skipped, total: dataItems.length };
+            broadcastFlowResult(result);
+            return result;
+          }
+
+          if (!retryResult.ok) {
+            if (retryFallback === "skip") {
+              skipped++;
+              broadcastProgress(i, dataItems.length, "skipped", skipped, `Item ${i + 1} retry failed — skipped: ${retryResult.error}`);
+              continue;
+            } else {
+              const result = { ok: false, error: `Item ${i + 1} retry failed: ${retryResult.error}`, completed, skipped, total: dataItems.length };
+              broadcastFlowResult(result);
+              return result;
+            }
+          }
+        }
       }
 
-      // Item completed — update progress
-      broadcastProgress(i + 1, dataItems.length, "done");
+      completed++;
+      broadcastProgress(completed, dataItems.length, "done", skipped);
     }
 
-    const result = { ok: true, message: `All ${dataItems.length} request(s) completed.`, completed: dataItems.length, total: dataItems.length };
+    const allOk = skipped === 0;
+    const msg = skipped > 0
+      ? `Batch finished. ${completed} succeeded, ${skipped} skipped out of ${dataItems.length}.`
+      : `All ${dataItems.length} request(s) completed.`;
+    const result = { ok: allOk, message: msg, completed, skipped, total: dataItems.length };
     broadcastFlowResult(result);
     return result;
   } finally {
@@ -204,8 +266,8 @@ function navigateAndWait(tabId, url) {
 
 // ── Progress broadcast ───────────────────────────────────────────
 
-function broadcastProgress(current, total, phase) {
-  chrome.runtime.sendMessage({ type: "FLOW_PROGRESS", current, total, phase }).catch(() => {});
+function broadcastProgress(current, total, phase, skipped, detail) {
+  chrome.runtime.sendMessage({ type: "FLOW_PROGRESS", current, total, phase, skipped: skipped || 0, detail }).catch(() => {});
 }
 
 function broadcastFlowResult(result) {

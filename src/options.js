@@ -63,6 +63,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("addFlowTemplateBtn").addEventListener("click", addFlowTemplate);
   document.getElementById("flowNameInput").addEventListener("input", scheduleFlowAutoSave);
   document.getElementById("flowStartUrl").addEventListener("input", scheduleFlowAutoSave);
+  document.getElementById("flowAlwaysNavigate").addEventListener("change", scheduleFlowAutoSave);
+  document.getElementById("flowOnError").addEventListener("change", (e) => {
+    document.getElementById("retryFallbackGroup").classList.toggle("hidden", e.target.value !== "retry");
+    scheduleFlowAutoSave();
+  });
+  document.getElementById("flowRetryFallback").addEventListener("change", scheduleFlowAutoSave);
 
   document.getElementById("domain").addEventListener("change", persistDomain);
   document.getElementById("reloadExtLink").addEventListener("click", (e) => {
@@ -722,6 +728,10 @@ function startNewFlow() {
 
   document.getElementById("flowNameInput").value = "";
   document.getElementById("flowStartUrl").value = "";
+  document.getElementById("flowAlwaysNavigate").checked = true;
+  document.getElementById("flowOnError").value = "stop";
+  document.getElementById("flowRetryFallback").value = "skip";
+  document.getElementById("retryFallbackGroup").classList.add("hidden");
   renderFlowTemplateList();
   renderTemplateList();
   renderFlowList();
@@ -737,6 +747,10 @@ function loadFlow(flow) {
 
   document.getElementById("flowNameInput").value = flow.name || "";
   document.getElementById("flowStartUrl").value = flow.startUrl || "";
+  document.getElementById("flowAlwaysNavigate").checked = flow.alwaysNavigate !== false;
+  document.getElementById("flowOnError").value = flow.onError || "stop";
+  document.getElementById("flowRetryFallback").value = flow.retryFallback || "skip";
+  document.getElementById("retryFallbackGroup").classList.toggle("hidden", (flow.onError || "stop") !== "retry");
   renderFlowTemplateList();
   renderTemplateList();
   renderFlowList();
@@ -747,11 +761,15 @@ function handleSaveFlow() {
   const name = document.getElementById("flowNameInput").value.trim();
   if (!name) { alert("Enter a flow name."); document.getElementById("flowNameInput").focus(); return; }
 
+  const onError = document.getElementById("flowOnError").value;
   const newFlow = {
     id: "flow_" + Date.now(),
     name,
     templateIds: [...flowTemplateIds],
     startUrl: document.getElementById("flowStartUrl").value.trim(),
+    alwaysNavigate: document.getElementById("flowAlwaysNavigate").checked,
+    onError,
+    retryFallback: onError === "retry" ? document.getElementById("flowRetryFallback").value : undefined,
   };
 
   flows.push(newFlow);
@@ -769,9 +787,13 @@ function handleUpdateFlow() {
   const name = document.getElementById("flowNameInput").value.trim();
   if (!name) { alert("Flow name cannot be empty."); return; }
 
+  const onError = document.getElementById("flowOnError").value;
   flow.name = name;
   flow.templateIds = [...flowTemplateIds];
   flow.startUrl = document.getElementById("flowStartUrl").value.trim();
+  flow.alwaysNavigate = document.getElementById("flowAlwaysNavigate").checked;
+  flow.onError = onError;
+  flow.retryFallback = onError === "retry" ? document.getElementById("flowRetryFallback").value : undefined;
 
   persistFlows();
   renderFlowList();
@@ -810,9 +832,13 @@ function exportFlow() {
     placeholder[cfg.key] = cfg.defaultValue || "";
   }
 
+  const onError = document.getElementById("flowOnError").value;
   const exportData = {
     configuration: mergedConfigs,
     startUrl: startUrl || undefined,
+    alwaysNavigate: document.getElementById("flowAlwaysNavigate").checked,
+    onError,
+    retryFallback: onError === "retry" ? document.getElementById("flowRetryFallback").value : undefined,
     data: [placeholder],
   };
 
@@ -951,6 +977,10 @@ function autoSaveFlow() {
   if (name) flow.name = name;
   flow.templateIds = [...flowTemplateIds];
   flow.startUrl = document.getElementById("flowStartUrl").value.trim();
+  flow.alwaysNavigate = document.getElementById("flowAlwaysNavigate").checked;
+  const onError = document.getElementById("flowOnError").value;
+  flow.onError = onError;
+  flow.retryFallback = onError === "retry" ? document.getElementById("flowRetryFallback").value : undefined;
 
   persistFlows();
   renderFlowList();
