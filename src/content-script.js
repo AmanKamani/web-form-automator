@@ -1,4 +1,10 @@
 (() => {
+  // Remove previous listener if script is re-injected into the same page
+  if (window.__snAutoFillListener) {
+    chrome.runtime.onMessage.removeListener(window.__snAutoFillListener);
+  }
+  window.__snAutoFillAborted = false;
+
   const RETRY_INTERVAL = 600;
   const MAX_RETRIES = 25;
   const TYPING_DELAY = 60;
@@ -6,15 +12,13 @@
   const DEFAULT_AJAX_WAIT = 1500;
   const DEFAULT_DROPDOWN_RETRIES = 15;
 
-  let _aborted = false;
-
   function checkAborted() {
-    if (_aborted) throw new Error("STOPPED");
+    if (window.__snAutoFillAborted) throw new Error("STOPPED");
   }
 
-  chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+  window.__snAutoFillListener = (msg, _sender, sendResponse) => {
     if (msg.type === "FILL_FORM") {
-      _aborted = false;
+      window.__snAutoFillAborted = false;
       handleFillForm(msg.payload, msg.fieldConfigs)
         .then((result) => {
           chrome.runtime.sendMessage(result);
@@ -34,12 +38,13 @@
     }
 
     if (msg.type === "STOP_AUTOMATION") {
-      _aborted = true;
+      window.__snAutoFillAborted = true;
       reportStep("Stop requested — aborting after current step.");
       sendResponse({ ok: true });
       return true;
     }
-  });
+  };
+  chrome.runtime.onMessage.addListener(window.__snAutoFillListener);
 
   // ────────────────────────────────────────────────────────────────
   // Main orchestration
@@ -65,11 +70,18 @@
           continue;
         }
         reportStep(`[${i + 1}/${fieldConfigs.length}] Expanding section "${name}"...`);
+        reportStep(`  Looking for text: ${JSON.stringify(matchTexts)}`);
 
         const trigger = await waitForExpandTrigger(matchTexts);
-        reportStep(`  Found: <${trigger.tagName.toLowerCase()}> class="${(trigger.className || "").substring(0, 80)}"`);
-        simulateClick(trigger);
-        reportStep(`  Clicked expand trigger.`);
+        const ariaExpanded = trigger.getAttribute("aria-expanded");
+        reportStep(`  Found: <${trigger.tagName.toLowerCase()}> class="${(trigger.className || "").substring(0, 80)}" aria-expanded="${ariaExpanded}"`);
+
+        if (ariaExpanded === "true") {
+          reportStep(`  Section already expanded — skipping click.`);
+        } else {
+          simulateClick(trigger);
+          reportStep(`  Clicked expand trigger.`);
+        }
 
         const waitMode = cfg.buttonWait || "smart_wait";
         if (waitMode === "no_wait") {
@@ -559,14 +571,14 @@
   function sleep(ms) {
     return new Promise((resolve, reject) => {
       const check = () => {
-        if (_aborted) return reject(new Error("STOPPED"));
+        if (window.__snAutoFillAborted) return reject(new Error("STOPPED"));
         resolve();
       };
       if (ms <= 200) return setTimeout(check, ms);
       // For longer sleeps, poll every 200ms so stop is responsive
       let elapsed = 0;
       const tick = () => {
-        if (_aborted) return reject(new Error("STOPPED"));
+        if (window.__snAutoFillAborted) return reject(new Error("STOPPED"));
         elapsed += 200;
         if (elapsed >= ms) return resolve();
         setTimeout(tick, 200);
@@ -617,7 +629,7 @@
     return new Promise((resolve, reject) => {
       let attempt = 0;
       const check = () => {
-        if (_aborted) return reject(new Error("STOPPED"));
+        if (window.__snAutoFillAborted) return reject(new Error("STOPPED"));
 
         const result = findExpandTrigger(matchTexts);
         if (result) return resolve(result);
@@ -637,52 +649,59 @@
   }
 
   function findExpandTrigger(matchTexts) {
-    // Step 1: Find the deepest element whose own text matches
+    // Step 1: Find the deepest element whose text content matches
+    // Search ALL matching text nodes, not just the first one
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-    let matchedNode = null;
+    const candidates = [];
     while (walker.nextNode()) {
       const text = walker.currentNode.textContent.toLowerCase().trim();
       if (!text) continue;
       for (const match of matchTexts) {
         if (text.includes(match)) {
-          matchedNode = walker.currentNode.parentElement;
+          const parentEl = walker.currentNode.parentElement;
+          if (parentEl && _isVisibleCS(parentEl)) {
+            candidates.push(parentEl);
+          }
           break;
         }
       }
-      if (matchedNode) break;
     }
 
-    if (!matchedNode || !_isVisibleCS(matchedNode)) return null;
+    if (candidates.length === 0) return null;
 
-    // Step 2: Walk up to the nearest clickable parent
-    let el = matchedNode;
-    for (let i = 0; i < 15; i++) {
-      if (!el || el === document.body) break;
-      const clickable =
-        el.tagName === "A" ||
-        el.tagName === "BUTTON" ||
-        el.tagName === "SUMMARY" ||
-        el.getAttribute("role") === "button" ||
-        el.hasAttribute("data-toggle") ||
-        el.hasAttribute("aria-expanded") ||
-        el.style.cursor === "pointer" ||
-        window.getComputedStyle(el).cursor === "pointer" ||
-        el.getAttribute("tabindex") !== null;
-      if (clickable) {
-        return el;
+    // Step 2: For each candidate, walk up to the nearest clickable parent
+    for (const matchedNode of candidates) {
+      let el = matchedNode;
+      for (let depth = 0; depth < 15; depth++) {
+        if (!el || el === document.body) break;
+        const clickable =
+          el.tagName === "A" ||
+          el.tagName === "BUTTON" ||
+          el.tagName === "SUMMARY" ||
+          el.getAttribute("role") === "button" ||
+          el.hasAttribute("data-toggle") ||
+          el.hasAttribute("aria-expanded") ||
+          el.style.cursor === "pointer" ||
+          window.getComputedStyle(el).cursor === "pointer" ||
+          el.getAttribute("tabindex") !== null;
+        if (clickable) {
+          console.log("[SN Expand] Found clickable:", el.tagName, el.className?.substring(0, 80), "for match:", matchTexts);
+          return el;
+        }
+        el = el.parentElement;
       }
-      el = el.parentElement;
     }
 
-    // Fallback: return the matched element itself
-    return matchedNode;
+    // Fallback: return the first matched element itself
+    console.log("[SN Expand] No clickable parent found, using fallback:", candidates[0].tagName, candidates[0].textContent?.substring(0, 80));
+    return candidates[0];
   }
 
   function waitForUrlChange(originalUrl, timeoutMs = 30000) {
     return new Promise((resolve, reject) => {
       const start = Date.now();
       const check = () => {
-        if (_aborted) return reject(new Error("STOPPED"));
+        if (window.__snAutoFillAborted) return reject(new Error("STOPPED"));
         if (window.location.href !== originalUrl) return resolve();
         if (Date.now() - start > timeoutMs) return resolve();
         setTimeout(check, 300);
@@ -695,7 +714,7 @@
     return new Promise((resolve, reject) => {
       const start = Date.now();
       const check = () => {
-        if (_aborted) return reject(new Error("STOPPED"));
+        if (window.__snAutoFillAborted) return reject(new Error("STOPPED"));
         const labels = document.querySelectorAll("label");
         for (const label of labels) {
           const text = label.textContent.toLowerCase().trim();
