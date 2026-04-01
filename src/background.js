@@ -32,8 +32,19 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === "STOP_AUTOMATION") {
     if (runningFlowState) runningFlowState.aborted = true;
     if (runningTabId !== null) {
-      chrome.tabs.sendMessage(runningTabId, { type: "STOP_AUTOMATION" }, () => {
-        if (chrome.runtime.lastError) { /* tab may be gone */ }
+      const tabId = runningTabId;
+      chrome.tabs.sendMessage(tabId, { type: "STOP_AUTOMATION" }, () => {
+        if (chrome.runtime.lastError) {
+          // Content script unreachable — force cleanup and notify side panel
+          runningTabId = null;
+          runningFlowState = null;
+          chrome.runtime.sendMessage({
+            type: "AUTOMATION_RESULT",
+            ok: false,
+            stopped: true,
+            error: "Automation stopped (tab unresponsive).",
+          }).catch(() => {});
+        }
       });
       sendResponse({ ok: true });
     } else {

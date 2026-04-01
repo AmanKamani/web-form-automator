@@ -270,6 +270,25 @@ function loadSelectedTemplate() {
       resetState();
       return;
     }
+
+    const ACTION_TYPES = ["button", "expand", "dialog"];
+    const configs = (tpl.fieldConfigs || []).filter((f) => f.enabled !== false);
+    const allActionOnly = configs.length > 0 && configs.every((f) => {
+      if (ACTION_TYPES.includes(f.fieldType)) {
+        if (f.fieldType === "dialog" && f.dialogType === "prompt" && f.dialogAction === "ok") return false;
+        return true;
+      }
+      return false;
+    });
+
+    if (allActionOnly) {
+      parsedPayload = {};
+      selectedFieldConfigs = tpl.fieldConfigs || null;
+      showPreviewSuccess({ info: "Action-only template — no input needed" });
+      runBtn.disabled = false;
+      return;
+    }
+
     const result = validateInput(tpl.payload);
     if (!result.valid) {
       showPreviewError(result.errors);
@@ -469,8 +488,20 @@ stopBtn.addEventListener("click", () => {
   chrome.runtime.sendMessage({ type: "STOP_AUTOMATION" }, (response) => {
     if (chrome.runtime.lastError || !response?.ok) {
       log("err", "Could not stop — automation may have already finished.");
+      setRunning(false);
+      hideProgress();
+      return;
     }
   });
+
+  // Safety: if no AUTOMATION_RESULT comes within 5s, force reset the UI
+  setTimeout(() => {
+    if (isRunning) {
+      log("warn", "Automation stopped (forced).");
+      setRunning(false);
+      hideProgress();
+    }
+  }, 5000);
 });
 
 clearLogBtn.addEventListener("click", () => clearLog());
