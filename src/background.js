@@ -7,7 +7,7 @@ let runningFlowState = null; // { current, total, aborted }
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === "STEP_LOG") {
-    chrome.runtime.sendMessage({ type: "STEP_LOG", text: msg.text }).catch(() => {});
+    chrome.runtime.sendMessage({ type: "STEP_LOG", text: msg.text, level: msg.level || "debug" }).catch(() => {});
     return;
   }
 

@@ -39,7 +39,7 @@
 
     if (msg.type === "STOP_AUTOMATION") {
       window.__snAutoFillAborted = true;
-      reportStep("Stop requested — aborting after current step.");
+      reportStep("Stop requested — aborting after current step.", "step");
       sendResponse({ ok: true });
       return true;
     }
@@ -51,8 +51,8 @@
   // ────────────────────────────────────────────────────────────────
 
   async function handleFillForm(payload, fieldConfigs) {
-    reportStep("Starting automation...");
-    reportStep(`Processing ${fieldConfigs.length} field(s) in configured order.`);
+    reportStep("Starting automation...", "step");
+    reportStep(`Processing ${fieldConfigs.length} field(s) in configured order.`, "step");
 
     const usedElements = new Set();
 
@@ -66,10 +66,10 @@
       if (cfg.fieldType === "expand") {
         const matchTexts = (cfg.labelMatch || []).map((m) => m.toLowerCase());
         if (matchTexts.length === 0) {
-          reportStep(`Skipping expand "${name}" — no label match configured.`);
+          reportStep(`Skipping expand "${name}" — no label match configured.`, "step");
           continue;
         }
-        reportStep(`[${i + 1}/${fieldConfigs.length}] Expanding section "${name}"...`);
+        reportStep(`[${i + 1}/${fieldConfigs.length}] Expanding section "${name}"...`, "step");
         reportStep(`  Looking for text: ${JSON.stringify(matchTexts)}`);
 
         const trigger = await waitForExpandTrigger(matchTexts);
@@ -77,7 +77,7 @@
         reportStep(`  Found: <${trigger.tagName.toLowerCase()}> class="${(trigger.className || "").substring(0, 80)}" aria-expanded="${ariaExpanded}"`);
 
         if (ariaExpanded === "true") {
-          reportStep(`  Section already expanded — skipping click.`);
+          reportStep(`  Section already expanded — skipping click.`, "step");
         } else {
           simulateClick(trigger);
           reportStep(`  Clicked expand trigger.`);
@@ -115,10 +115,10 @@
       if (cfg.fieldType === "button") {
         const btnText = cfg.displayName || cfg.key;
         if (!btnText) {
-          reportStep(`Skipping button "${name}" — no button text specified.`);
+          reportStep(`Skipping button "${name}" — no button text specified.`, "step");
           continue;
         }
-        reportStep(`[${i + 1}/${fieldConfigs.length}] Clicking button "${btnText}"...`);
+        reportStep(`[${i + 1}/${fieldConfigs.length}] Clicking button "${btnText}"...`, "step");
 
         const waitMode = cfg.buttonWait || "smart_wait";
         const urlBefore = window.location.href;
@@ -161,11 +161,11 @@
       }
 
       if (value === null || value === undefined || value === "") {
-        reportStep(`Skipping "${name}" — no value in payload for key "${cfg.key}".`);
+        reportStep(`Skipping "${name}" — no value in payload for key "${cfg.key}".`, "step");
         continue;
       }
 
-      reportStep(`[${i + 1}/${fieldConfigs.length}] Processing "${name}" (${cfg.fieldType})...`);
+      reportStep(`[${i + 1}/${fieldConfigs.length}] Processing "${name}" (${cfg.fieldType})...`, "step");
 
       const ajaxWait = cfg.ajaxWait || DEFAULT_AJAX_WAIT;
       const retries = cfg.dropdownRetries || DEFAULT_DROPDOWN_RETRIES;
@@ -219,7 +219,7 @@
       await sleep(800);
     }
 
-    reportStep("Automation complete — all fields processed.");
+    reportStep("Automation complete — all fields processed.", "step");
     return { type: "AUTOMATION_RESULT", ok: true, message: "All fields processed successfully." };
   }
 
@@ -384,7 +384,7 @@
     // Look for results in the Select2 dropdown
     const picked = await pickSelect2Result(value, retries);
     if (!picked) {
-      reportStep(`  Warn: no Select2 result for "${value}", pressing Enter.`);
+      reportStep(`  Warn: no Select2 result for "${value}", pressing Enter.`, "step");
       pressKey(searchInput, "Enter");
       await sleep(500);
     }
@@ -464,7 +464,7 @@
 
     const picked = await pickFromDropdown(value, domBefore, retries);
     if (!picked) {
-      reportStep(`  Warn: no dropdown match, pressing Enter.`);
+      reportStep(`  Warn: no dropdown match, pressing Enter.`, "step");
       pressKey(el, "Enter");
       await sleep(800);
     }
@@ -729,8 +729,8 @@
     });
   }
 
-  function reportStep(msg) {
+  function reportStep(msg, level) {
     console.log("[SN Group Join]", msg);
-    try { chrome.runtime.sendMessage({ type: "STEP_LOG", text: msg }); } catch (_) {}
+    try { chrome.runtime.sendMessage({ type: "STEP_LOG", text: msg, level: level || "debug" }); } catch (_) {}
   }
 })();

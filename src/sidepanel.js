@@ -18,6 +18,8 @@ let parsedPayload = null;
 let selectedFieldConfigs = null;
 let storageData = {};
 let isRunning = false;
+let debugMode = false;
+const debugToggle = document.getElementById("debugLogToggle");
 
 // Flow mode state
 let flowConfiguration = null;
@@ -36,6 +38,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   activateMode(currentMode);
   populateTemplates();
   populateFlows();
+
+  // Restore debug toggle state
+  chrome.storage.sync.get("debugLogs", (data) => {
+    debugMode = data.debugLogs === true;
+    debugToggle.checked = debugMode;
+  });
+  debugToggle.addEventListener("change", () => {
+    debugMode = debugToggle.checked;
+    chrome.storage.sync.set({ debugLogs: debugMode });
+  });
 
   if (currentMode === "template") loadSelectedTemplate();
   if (currentMode === "flow") loadSelectedFlow();
@@ -93,7 +105,9 @@ chrome.runtime.onMessage.addListener((msg) => {
   }
 
   if (msg.type === "STEP_LOG") {
-    log("step", msg.text);
+    const level = msg.level || "debug";
+    if (level === "debug" && !debugMode) return;
+    log(level === "debug" ? "debug" : "step", msg.text);
   }
 });
 
@@ -460,6 +474,17 @@ stopBtn.addEventListener("click", () => {
 });
 
 clearLogBtn.addEventListener("click", () => clearLog());
+
+// ── Quick links ──────────────────────────────────────────────────
+
+document.getElementById("linkConfigTemplates").addEventListener("click", (e) => {
+  e.preventDefault();
+  chrome.runtime.openOptionsPage();
+});
+document.getElementById("linkConfigFlows").addEventListener("click", (e) => {
+  e.preventDefault();
+  chrome.runtime.openOptionsPage();
+});
 
 function setRunning(running) {
   isRunning = running;

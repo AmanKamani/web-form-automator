@@ -63,10 +63,22 @@
     <section id="statusLog" class="status-log">
       <div class="log-header">
         <h2>Live Log</h2>
-        <button id="clearLogBtn" class="btn-clear" title="Clear log">Clear</button>
+        <div class="log-header-actions">
+          <label class="debug-toggle" title="Show detailed debug logs">
+            <input type="checkbox" id="debugLogToggle">
+            Debug
+          </label>
+          <button id="clearLogBtn" class="btn-clear" title="Clear log">Clear</button>
+        </div>
       </div>
       <ul id="logList"></ul>
     </section>
+
+    <footer class="quick-links">
+      <a href="#" id="linkConfigTemplates">Configure Templates</a>
+      <span class="link-sep">|</span>
+      <a href="#" id="linkConfigFlows">Configure Flows</a>
+    </footer>
 
   </div>
 
