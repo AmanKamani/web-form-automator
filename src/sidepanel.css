@@ -10,9 +10,9 @@ body {
   width: 100%;
   height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, sans-serif;
-  font-size: var(--sn-font-base);
-  color: var(--sn-text-primary);
-  background: var(--sn-bg-page);
+  font-size: var(--app-font-base);
+  color: var(--app-text-primary);
+  background: var(--app-bg-page);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -27,18 +27,18 @@ body {
 }
 
 h1 {
-  font-size: var(--sn-font-xl);
+  font-size: var(--app-font-xl);
   font-weight: 600;
   margin-bottom: 14px;
-  color: var(--sn-text-heading);
+  color: var(--app-text-heading);
 }
 
 h2 {
-  font-size: var(--sn-font-badge);
+  font-size: var(--app-font-badge);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--sn-text-muted);
+  color: var(--app-text-muted);
 }
 
 /* Mode tabs */
@@ -47,7 +47,7 @@ h2 {
 .mode-tabs {
   display: flex;
   gap: 0;
-  border: 1px solid var(--sn-border-default);
+  border: 1px solid var(--app-border-default);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -55,25 +55,25 @@ h2 {
 .mode-tab {
   flex: 1;
   padding: 8px 6px;
-  font-size: var(--sn-font-sm);
+  font-size: var(--app-font-sm);
   font-weight: 500;
   text-align: center;
-  background: var(--sn-bg-surface);
-  color: var(--sn-text-muted);
+  background: var(--app-bg-surface);
+  color: var(--app-text-muted);
   border: none;
   cursor: pointer;
   transition: background 0.12s, color 0.12s;
 }
 
-.mode-tab:not(:last-child) { border-right: 1px solid var(--sn-border-default); }
-.mode-tab:hover { background: var(--sn-bg-hover); }
-.mode-tab.active { background: var(--sn-primary); color: var(--sn-text-on-primary); }
+.mode-tab:not(:last-child) { border-right: 1px solid var(--app-border-default); }
+.mode-tab:hover { background: var(--app-bg-hover); }
+.mode-tab.active { background: var(--app-primary); color: var(--app-text-on-primary); }
 
 .mode-panel { margin-bottom: 12px; flex-shrink: 0; }
 
 .mode-hint {
-  font-size: var(--sn-font-badge);
-  color: var(--sn-text-muted);
+  font-size: var(--app-font-badge);
+  color: var(--app-text-muted);
   padding: 8px 0;
 }
 
@@ -95,18 +95,18 @@ h2 {
   width: 30px;
   height: 30px;
   border-radius: 6px;
-  background: var(--sn-bg-hover);
-  color: var(--sn-text-secondary);
+  background: var(--app-bg-hover);
+  color: var(--app-text-secondary);
   text-decoration: none;
-  font-size: var(--sn-font-lg);
+  font-size: var(--app-font-lg);
   cursor: pointer;
   flex-shrink: 0;
   transition: background 0.15s, color 0.15s;
 }
 
 .config-link:hover {
-  background: var(--sn-primary);
-  color: var(--sn-text-on-primary);
+  background: var(--app-primary);
+  color: var(--app-text-on-primary);
 }
 
 .config-link.hidden { display: none; }
@@ -114,10 +114,10 @@ h2 {
 #templateSelect, #flowSelect {
   width: 100%;
   padding: 8px 10px;
-  font-size: var(--sn-font-base);
-  border: 1px solid var(--sn-border-input);
+  font-size: var(--app-font-base);
+  border: 1px solid var(--app-border-input);
   border-radius: 6px;
-  background: var(--sn-bg-surface);
+  background: var(--app-bg-surface);
 }
 
 #flowSelect { margin-bottom: 8px; }
@@ -129,17 +129,17 @@ h2 {
 .file-label {
   display: block;
   padding: 12px 14px;
-  border: 2px dashed var(--sn-border-input);
+  border: 2px dashed var(--app-border-input);
   border-radius: 8px;
   text-align: center;
   cursor: pointer;
-  color: var(--sn-text-muted);
+  color: var(--app-text-muted);
   transition: border-color 0.15s, background 0.15s;
 }
 
 .file-label:hover {
-  border-color: var(--sn-primary);
-  background: var(--sn-primary-lighter);
+  border-color: var(--app-primary);
+  background: var(--app-primary-lighter);
 }
 
 .file-label input {
@@ -147,9 +147,9 @@ h2 {
 }
 
 .file-label.loaded {
-  border-color: var(--sn-success-alt);
-  background: var(--sn-success-lighter);
-  color: var(--sn-success-text);
+  border-color: var(--app-success-alt);
+  background: var(--app-success-lighter);
+  color: var(--app-success-text);
 }
 
 .flow-data-upload {
@@ -159,9 +159,9 @@ h2 {
 .preview {
   margin-top: 10px;
   padding: 10px;
-  background: var(--sn-bg-hover);
+  background: var(--app-bg-hover);
   border-radius: 6px;
-  font-size: var(--sn-font-badge);
+  font-size: var(--app-font-badge);
   max-height: 120px;
   overflow-y: auto;
   white-space: pre-wrap;
@@ -184,7 +184,7 @@ h2 {
 .btn {
   display: inline-block;
   padding: 8px 16px;
-  font-size: var(--sn-font-base);
+  font-size: var(--app-font-base);
   font-weight: 500;
   border: none;
   border-radius: 6px;
@@ -198,32 +198,32 @@ h2 {
 }
 
 .btn-primary {
-  background: var(--sn-primary);
-  color: var(--sn-text-on-primary);
+  background: var(--app-primary);
+  color: var(--app-text-on-primary);
   width: 100%;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--sn-primary-hover);
+  background: var(--app-primary-hover);
 }
 
 .btn-secondary {
-  background: var(--sn-border-default);
-  color: var(--sn-text-strong);
+  background: var(--app-border-default);
+  color: var(--app-text-strong);
 }
 
 .btn-secondary:hover {
-  background: var(--sn-border-input);
+  background: var(--app-border-input);
 }
 
 .btn-stop {
-  background: var(--sn-danger);
-  color: var(--sn-text-on-primary);
+  background: var(--app-danger);
+  color: var(--app-text-on-primary);
   width: 100%;
 }
 
 .btn-stop:hover {
-  background: var(--sn-danger-hover);
+  background: var(--app-danger-hover);
 }
 
 /* ── Progress display ───────────────────────────── */
@@ -239,29 +239,29 @@ h2 {
 .progress-bar-container {
   flex: 1;
   height: 8px;
-  background: var(--sn-border-default);
+  background: var(--app-border-default);
   border-radius: 4px;
   overflow: hidden;
 }
 
 .progress-bar {
   height: 100%;
-  background: var(--sn-primary);
+  background: var(--app-primary);
   border-radius: 4px;
   transition: width 0.3s ease;
 }
 
 .progress-text {
-  font-size: var(--sn-font-badge);
+  font-size: var(--app-font-badge);
   font-weight: 600;
-  color: var(--sn-text-secondary);
+  color: var(--app-text-secondary);
   white-space: nowrap;
 }
 
 /* ── Status log ─────────────────────────────────── */
 
 .status-log {
-  border-top: 1px solid var(--sn-border-default);
+  border-top: 1px solid var(--app-border-default);
   padding-top: 10px;
   flex: 1;
   display: flex;
@@ -279,19 +279,19 @@ h2 {
 
 .btn-clear {
   padding: 3px 10px;
-  font-size: var(--sn-font-sm);
+  font-size: var(--app-font-sm);
   font-weight: 500;
-  color: var(--sn-text-faint);
+  color: var(--app-text-faint);
   background: none;
-  border: 1px solid var(--sn-border-default);
+  border: 1px solid var(--app-border-default);
   border-radius: 4px;
   cursor: pointer;
   transition: background 0.12s, color 0.12s;
 }
 
 .btn-clear:hover {
-  background: var(--sn-bg-hover);
-  color: var(--sn-text-secondary);
+  background: var(--app-bg-hover);
+  color: var(--app-text-secondary);
 }
 
 #logList {
@@ -303,7 +303,7 @@ h2 {
 
 #logList li {
   padding: 3px 0;
-  font-size: var(--sn-font-badge);
+  font-size: var(--app-font-badge);
   display: flex;
   align-items: flex-start;
   gap: 6px;
@@ -319,8 +319,8 @@ h2 {
 }
 
 #logList li .timestamp {
-  font-size: var(--sn-font-xs);
-  color: var(--sn-text-faint);
+  font-size: var(--app-font-xs);
+  color: var(--app-text-faint);
   font-family: "SF Mono", Menlo, monospace;
   flex-shrink: 0;
   margin-top: 1px;
@@ -330,13 +330,13 @@ h2 {
   word-break: break-word;
 }
 
-.dot-info { background: var(--sn-primary); }
-.dot-ok   { background: var(--sn-success-alt); }
-.dot-err  { background: var(--sn-danger); }
-.dot-warn { background: var(--sn-warning); }
-.dot-wait { background: var(--sn-warning); }
-.dot-step { background: var(--sn-purple); }
-.dot-debug { background: var(--sn-text-faint); }
+.dot-info { background: var(--app-primary); }
+.dot-ok   { background: var(--app-success-alt); }
+.dot-err  { background: var(--app-danger); }
+.dot-warn { background: var(--app-warning); }
+.dot-wait { background: var(--app-warning); }
+.dot-step { background: var(--app-purple); }
+.dot-debug { background: var(--app-text-faint); }
 
 /* ── Log header actions ────────────────────────── */
 
@@ -350,8 +350,8 @@ h2 {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: var(--sn-font-sm);
-  color: var(--sn-text-faint);
+  font-size: var(--app-font-sm);
+  color: var(--app-text-faint);
   cursor: pointer;
   user-select: none;
 }
@@ -367,13 +367,13 @@ h2 {
 .quick-links {
   flex-shrink: 0;
   padding: 10px 0 2px;
-  border-top: 1px solid var(--sn-border-default);
+  border-top: 1px solid var(--app-border-default);
   text-align: center;
-  font-size: var(--sn-font-badge);
+  font-size: var(--app-font-badge);
 }
 
 .quick-links a {
-  color: var(--sn-primary);
+  color: var(--app-primary);
   text-decoration: none;
   font-weight: 500;
 }
@@ -383,6 +383,6 @@ h2 {
 }
 
 .link-sep {
-  color: var(--sn-border-input);
+  color: var(--app-border-input);
   margin: 0 6px;
 }

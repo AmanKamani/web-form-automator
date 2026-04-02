@@ -1,12 +1,12 @@
 (() => {
   // Remove ALL previous listeners to prevent duplicate execution
-  if (window.__snAutoFillListeners) {
-    window.__snAutoFillListeners.forEach((fn) => {
+  if (window.__appAutoFillListeners) {
+    window.__appAutoFillListeners.forEach((fn) => {
       try { chrome.runtime.onMessage.removeListener(fn); } catch (_) {}
     });
   }
-  window.__snAutoFillListeners = [];
-  window.__snAutoFillAborted = false;
+  window.__appAutoFillListeners = [];
+  window.__appAutoFillAborted = false;
 
   const RETRY_INTERVAL = 600;
   const MAX_RETRIES = 25;
@@ -16,12 +16,12 @@
   const DEFAULT_DROPDOWN_RETRIES = 15;
 
   function checkAborted() {
-    if (window.__snAutoFillAborted) throw new Error("STOPPED");
+    if (window.__appAutoFillAborted) throw new Error("STOPPED");
   }
 
   const listener = (msg, _sender, sendResponse) => {
     if (msg.type === "FILL_FORM") {
-      window.__snAutoFillAborted = false;
+      window.__appAutoFillAborted = false;
       handleFillForm(msg.payload, msg.fieldConfigs)
         .then((result) => {
           chrome.runtime.sendMessage(result);
@@ -41,13 +41,13 @@
     }
 
     if (msg.type === "STOP_AUTOMATION") {
-      window.__snAutoFillAborted = true;
+      window.__appAutoFillAborted = true;
       reportStep("Stop requested — aborting after current step.", "step");
       sendResponse({ ok: true });
       return true;
     }
   };
-  window.__snAutoFillListeners.push(listener);
+  window.__appAutoFillListeners.push(listener);
   chrome.runtime.onMessage.addListener(listener);
 
   // ────────────────────────────────────────────────────────────────
@@ -122,7 +122,7 @@
         const promptVal = cfg.promptReturnValue || "";
         const desc = dlgType === "confirm" ? `confirm (return ${dlgReturn})` : dlgType === "prompt" ? `prompt (return "${promptVal}")` : "alert";
         reportStep(`[${i + 1}/${fieldConfigs.length}] Arming ${desc} interceptor — will auto-dismiss next dialog.`);
-        window.postMessage({ type: "__SN_SET_DIALOG_CONFIG", dialogAction: "ok", confirmReturnValue: dlgReturn, promptReturnValue: promptVal }, "*");
+        window.postMessage({ type: "__APP_SET_DIALOG_CONFIG", dialogAction: "ok", confirmReturnValue: dlgReturn, promptReturnValue: promptVal }, "*");
         await sleep(50);
         continue;
       }
@@ -145,7 +145,7 @@
           const promptVal = nextCfg.promptReturnValue || "";
           const desc = dlgType === "confirm" ? `confirm (return ${dlgReturn})` : dlgType === "prompt" ? `prompt (return "${promptVal}")` : "alert";
           reportStep(`  Pre-arming ${desc} interceptor (next field is dialog)...`);
-          window.postMessage({ type: "__SN_SET_DIALOG_CONFIG", dialogAction: "ok", confirmReturnValue: dlgReturn, promptReturnValue: promptVal }, "*");
+          window.postMessage({ type: "__APP_SET_DIALOG_CONFIG", dialogAction: "ok", confirmReturnValue: dlgReturn, promptReturnValue: promptVal }, "*");
           await sleep(50);
           dialogArmed = true;
         }
@@ -169,7 +169,7 @@
               }
             }, 2000);
             const handler = (e) => {
-              if (e.data && e.data.type === "__SN_DIALOG_INTERCEPTED") {
+              if (e.data && e.data.type === "__APP_DIALOG_INTERCEPTED") {
                 window.removeEventListener("message", handler);
                 clearTimeout(timer);
                 if (!done) {
@@ -222,7 +222,7 @@
 
         if (dialogArmed) {
           await dialogInterceptionPromise;
-          window.postMessage({ type: "__SN_CLEAR_DIALOG_CONFIG" }, "*");
+          window.postMessage({ type: "__APP_CLEAR_DIALOG_CONFIG" }, "*");
           i++; // skip the next dialog field since we already handled it
         }
         continue;
@@ -639,14 +639,14 @@
   function sleep(ms) {
     return new Promise((resolve, reject) => {
       const check = () => {
-        if (window.__snAutoFillAborted) return reject(new Error("STOPPED"));
+        if (window.__appAutoFillAborted) return reject(new Error("STOPPED"));
         resolve();
       };
       if (ms <= 200) return setTimeout(check, ms);
       // For longer sleeps, poll every 200ms so stop is responsive
       let elapsed = 0;
       const tick = () => {
-        if (window.__snAutoFillAborted) return reject(new Error("STOPPED"));
+        if (window.__appAutoFillAborted) return reject(new Error("STOPPED"));
         elapsed += 200;
         if (elapsed >= ms) return resolve();
         setTimeout(tick, 200);
@@ -697,7 +697,7 @@
     return new Promise((resolve, reject) => {
       let attempt = 0;
       const check = () => {
-        if (window.__snAutoFillAborted) return reject(new Error("STOPPED"));
+        if (window.__appAutoFillAborted) return reject(new Error("STOPPED"));
 
         const result = findExpandTrigger(matchTexts);
         if (result) return resolve(result);
@@ -753,7 +753,7 @@
           window.getComputedStyle(el).cursor === "pointer" ||
           el.getAttribute("tabindex") !== null;
         if (clickable) {
-          console.log("[SN Expand] Found clickable:", el.tagName, el.className?.substring(0, 80), "for match:", matchTexts);
+          console.log("[Expand] Found clickable:", el.tagName, el.className?.substring(0, 80), "for match:", matchTexts);
           return el;
         }
         el = el.parentElement;
@@ -761,7 +761,7 @@
     }
 
     // Fallback: return the first matched element itself
-    console.log("[SN Expand] No clickable parent found, using fallback:", candidates[0].tagName, candidates[0].textContent?.substring(0, 80));
+    console.log("[Expand] No clickable parent found, using fallback:", candidates[0].tagName, candidates[0].textContent?.substring(0, 80));
     return candidates[0];
   }
 
@@ -769,7 +769,7 @@
     return new Promise((resolve, reject) => {
       const start = Date.now();
       const check = () => {
-        if (window.__snAutoFillAborted) return reject(new Error("STOPPED"));
+        if (window.__appAutoFillAborted) return reject(new Error("STOPPED"));
         if (window.location.href !== originalUrl) return resolve();
         if (Date.now() - start > timeoutMs) return resolve();
         setTimeout(check, 300);
@@ -782,7 +782,7 @@
     return new Promise((resolve, reject) => {
       const start = Date.now();
       const check = () => {
-        if (window.__snAutoFillAborted) return reject(new Error("STOPPED"));
+        if (window.__appAutoFillAborted) return reject(new Error("STOPPED"));
         const labels = document.querySelectorAll("label");
         for (const label of labels) {
           const text = label.textContent.toLowerCase().trim();
@@ -798,7 +798,7 @@
   }
 
   function reportStep(msg, level) {
-    console.log("[SN Group Join]", msg);
+    console.log("[AutoFill]", msg);
     try { chrome.runtime.sendMessage({ type: "STEP_LOG", text: msg, level: level || "debug" }); } catch (_) {}
   }
 })();

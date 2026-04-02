@@ -1,160 +1,160 @@
 :root {
   /* ── Text ────────────────────────────────────────────── */
-  --sn-text-primary: #1e293b;
-  --sn-text-secondary: #475569;
-  --sn-text-muted: #64748b;
-  --sn-text-faint: #94a3b8;
-  --sn-text-heading: #0f172a;
-  --sn-text-on-primary: #fff;
-  --sn-text-strong: #334155;
+  --app-text-primary: #1e293b;
+  --app-text-secondary: #475569;
+  --app-text-muted: #64748b;
+  --app-text-faint: #94a3b8;
+  --app-text-heading: #0f172a;
+  --app-text-on-primary: #fff;
+  --app-text-strong: #334155;
 
   /* ── Surfaces ────────────────────────────────────────── */
-  --sn-bg-page: #f8fafc;
-  --sn-bg-page-alt: #f1f5f9;
-  --sn-bg-surface: #fff;
-  --sn-bg-raised: #fafbfc;
-  --sn-bg-hover: #f1f5f9;
-  --sn-bg-toast: #1e293b;
+  --app-bg-page: #f8fafc;
+  --app-bg-page-alt: #f1f5f9;
+  --app-bg-surface: #fff;
+  --app-bg-raised: #fafbfc;
+  --app-bg-hover: #f1f5f9;
+  --app-bg-toast: #1e293b;
 
   /* ── Borders ─────────────────────────────────────────── */
-  --sn-border-default: #e2e8f0;
-  --sn-border-input: #cbd5e1;
-  --sn-border-subtle: #d1d5db;
+  --app-border-default: #e2e8f0;
+  --app-border-input: #cbd5e1;
+  --app-border-subtle: #d1d5db;
 
   /* ── Primary (blue) ──────────────────────────────────── */
-  --sn-primary: #3b82f6;
-  --sn-primary-hover: #2563eb;
-  --sn-primary-dark: #1d4ed8;
-  --sn-primary-light: #dbeafe;
-  --sn-primary-lighter: #eff6ff;
-  --sn-primary-border: #93c5fd;
-  --sn-primary-border-light: #bfdbfe;
+  --app-primary: #3b82f6;
+  --app-primary-hover: #2563eb;
+  --app-primary-dark: #1d4ed8;
+  --app-primary-light: #dbeafe;
+  --app-primary-lighter: #eff6ff;
+  --app-primary-border: #93c5fd;
+  --app-primary-border-light: #bfdbfe;
 
   /* ── Danger (red) ────────────────────────────────────── */
-  --sn-danger: #ef4444;
-  --sn-danger-hover: #dc2626;
-  --sn-danger-light: #fef2f2;
-  --sn-danger-border: #fca5a5;
+  --app-danger: #ef4444;
+  --app-danger-hover: #dc2626;
+  --app-danger-light: #fef2f2;
+  --app-danger-border: #fca5a5;
 
   /* ── Success (green) ─────────────────────────────────── */
-  --sn-success: #10b981;
-  --sn-success-alt: #22c55e;
-  --sn-success-light: #dcfce7;
-  --sn-success-lighter: #f0fdf4;
-  --sn-success-text: #166534;
-  --sn-success-text-dark: #065f46;
-  --sn-success-border: #6ee7b7;
+  --app-success: #10b981;
+  --app-success-alt: #22c55e;
+  --app-success-light: #dcfce7;
+  --app-success-lighter: #f0fdf4;
+  --app-success-text: #166534;
+  --app-success-text-dark: #065f46;
+  --app-success-border: #6ee7b7;
 
   /* ── Warning (amber) ─────────────────────────────────── */
-  --sn-warning: #f59e0b;
-  --sn-warning-light: #fef3c7;
-  --sn-warning-lighter: #fffbeb;
-  --sn-warning-text: #92400e;
-  --sn-warning-border: #fcd34d;
+  --app-warning: #f59e0b;
+  --app-warning-light: #fef3c7;
+  --app-warning-lighter: #fffbeb;
+  --app-warning-text: #92400e;
+  --app-warning-border: #fcd34d;
 
   /* ── Info (sky / cyan) ───────────────────────────────── */
-  --sn-info: #0ea5e9;
-  --sn-info-light: #f0f9ff;
-  --sn-info-lighter: #e0f2fe;
-  --sn-info-border: #bae6fd;
-  --sn-info-border-light: #7dd3fc;
-  --sn-info-text: #075985;
-  --sn-info-accent: #38bdf8;
+  --app-info: #0ea5e9;
+  --app-info-light: #f0f9ff;
+  --app-info-lighter: #e0f2fe;
+  --app-info-border: #bae6fd;
+  --app-info-border-light: #7dd3fc;
+  --app-info-text: #075985;
+  --app-info-accent: #38bdf8;
 
   /* ── Purple ──────────────────────────────────────────── */
-  --sn-purple: #8b5cf6;
-  --sn-purple-light: #ede9fe;
-  --sn-purple-lighter: #f5f3ff;
-  --sn-purple-text: #5b21b6;
-  --sn-purple-border: #c4b5fd;
+  --app-purple: #8b5cf6;
+  --app-purple-light: #ede9fe;
+  --app-purple-lighter: #f5f3ff;
+  --app-purple-text: #5b21b6;
+  --app-purple-border: #c4b5fd;
 
   /* ── Indigo ──────────────────────────────────────────── */
-  --sn-indigo: #6366f1;
-  --sn-indigo-light: #eef2ff;
-  --sn-indigo-text: #3730a3;
-  --sn-indigo-border: #a5b4fc;
+  --app-indigo: #6366f1;
+  --app-indigo-light: #eef2ff;
+  --app-indigo-text: #3730a3;
+  --app-indigo-border: #a5b4fc;
 
   /* ── Orange ──────────────────────────────────────────── */
-  --sn-orange: #f97316;
-  --sn-orange-light: #fff7ed;
-  --sn-orange-text: #c2410c;
-  --sn-orange-border: #fdba74;
+  --app-orange: #f97316;
+  --app-orange-light: #fff7ed;
+  --app-orange-text: #c2410c;
+  --app-orange-border: #fdba74;
 
   /* ── Field-type tokens ───────────────────────────────── */
-  --sn-type-button-bg: var(--sn-warning-light);
-  --sn-type-button-text: var(--sn-warning-text);
-  --sn-type-button-border: var(--sn-warning-border);
-  --sn-type-button-accent: var(--sn-warning);
-  --sn-type-button-light: var(--sn-warning-lighter);
+  --app-type-button-bg: var(--app-warning-light);
+  --app-type-button-text: var(--app-warning-text);
+  --app-type-button-border: var(--app-warning-border);
+  --app-type-button-accent: var(--app-warning);
+  --app-type-button-light: var(--app-warning-lighter);
 
-  --sn-type-expand-bg: var(--sn-purple-light);
-  --sn-type-expand-text: var(--sn-purple-text);
-  --sn-type-expand-border: var(--sn-purple-border);
-  --sn-type-expand-accent: var(--sn-purple);
-  --sn-type-expand-light: var(--sn-purple-lighter);
+  --app-type-expand-bg: var(--app-purple-light);
+  --app-type-expand-text: var(--app-purple-text);
+  --app-type-expand-border: var(--app-purple-border);
+  --app-type-expand-accent: var(--app-purple);
+  --app-type-expand-light: var(--app-purple-lighter);
 
-  --sn-type-typeahead-bg: var(--sn-info-lighter);
-  --sn-type-typeahead-text: var(--sn-info-text);
-  --sn-type-typeahead-border: var(--sn-info-border-light);
-  --sn-type-typeahead-accent: var(--sn-info-accent);
+  --app-type-typeahead-bg: var(--app-info-lighter);
+  --app-type-typeahead-text: var(--app-info-text);
+  --app-type-typeahead-border: var(--app-info-border-light);
+  --app-type-typeahead-accent: var(--app-info-accent);
 
-  --sn-type-text-bg: #ecfdf5;
-  --sn-type-text-text: var(--sn-success-text-dark);
-  --sn-type-text-border: var(--sn-success-border);
-  --sn-type-text-accent: var(--sn-success);
+  --app-type-text-bg: #ecfdf5;
+  --app-type-text-text: var(--app-success-text-dark);
+  --app-type-text-border: var(--app-success-border);
+  --app-type-text-accent: var(--app-success);
 
-  --sn-type-choice-bg: var(--sn-indigo-light);
-  --sn-type-choice-text: var(--sn-indigo-text);
-  --sn-type-choice-border: var(--sn-indigo-border);
-  --sn-type-choice-accent: var(--sn-indigo);
+  --app-type-choice-bg: var(--app-indigo-light);
+  --app-type-choice-text: var(--app-indigo-text);
+  --app-type-choice-border: var(--app-indigo-border);
+  --app-type-choice-accent: var(--app-indigo);
 
-  --sn-type-dialog-bg: var(--sn-orange-light);
-  --sn-type-dialog-text: var(--sn-orange-text);
-  --sn-type-dialog-border: var(--sn-orange-border);
-  --sn-type-dialog-accent: var(--sn-orange);
+  --app-type-dialog-bg: var(--app-orange-light);
+  --app-type-dialog-text: var(--app-orange-text);
+  --app-type-dialog-border: var(--app-orange-border);
+  --app-type-dialog-accent: var(--app-orange);
 
   /* ── Section icon colors ─────────────────────────────── */
-  --sn-icon-templates: var(--sn-primary);
-  --sn-icon-flows: var(--sn-purple);
-  --sn-icon-payload: var(--sn-success);
-  --sn-icon-field-config: var(--sn-warning);
-  --sn-icon-start-url: var(--sn-info);
-  --sn-icon-error-handling: var(--sn-danger);
-  --sn-icon-flow-templates: var(--sn-indigo);
+  --app-icon-templates: var(--app-primary);
+  --app-icon-flows: var(--app-purple);
+  --app-icon-payload: var(--app-success);
+  --app-icon-field-config: var(--app-warning);
+  --app-icon-start-url: var(--app-info);
+  --app-icon-error-handling: var(--app-danger);
+  --app-icon-flow-templates: var(--app-indigo);
 
   /* ── Font sizes ──────────────────────────────────────── */
-  --sn-font-xs: 10px;
-  --sn-font-sm: 11px;
-  --sn-font-base: 13px;
-  --sn-font-md: 14px;
-  --sn-font-lg: 15px;
-  --sn-font-xl: 16px;
-  --sn-font-2xl: 18px;
-  --sn-font-icon: 48px;
-  --sn-font-badge: 12px;
+  --app-font-xs: 10px;
+  --app-font-sm: 11px;
+  --app-font-base: 13px;
+  --app-font-md: 14px;
+  --app-font-lg: 15px;
+  --app-font-xl: 16px;
+  --app-font-2xl: 18px;
+  --app-font-icon: 48px;
+  --app-font-badge: 12px;
 
   /* ── Modal ────────────────────────────────────────────── */
-  --sn-modal-bg: var(--sn-bg-surface);
-  --sn-modal-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-  --sn-modal-radius: 12px;
-  --sn-modal-title-color: var(--sn-text-heading);
-  --sn-modal-text-color: var(--sn-text-secondary);
+  --app-modal-bg: var(--app-bg-surface);
+  --app-modal-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  --app-modal-radius: 12px;
+  --app-modal-title-color: var(--app-text-heading);
+  --app-modal-text-color: var(--app-text-secondary);
 
   /* ── Warning button ─────────────────────────────────── */
-  --sn-warning-btn-bg: var(--sn-warning);
-  --sn-warning-btn-hover: #d97706;
-  --sn-warning-btn-text: #fff;
+  --app-warning-btn-bg: var(--app-warning);
+  --app-warning-btn-hover: #d97706;
+  --app-warning-btn-text: #fff;
 
   /* ── Info button ──────────────────────────────────── */
-  --sn-info-btn-bg: var(--sn-info);
-  --sn-info-btn-hover: #0284c7;
-  --sn-info-btn-text: #fff;
+  --app-info-btn-bg: var(--app-info);
+  --app-info-btn-hover: #0284c7;
+  --app-info-btn-text: #fff;
 
   /* ── Shadows / glows ─────────────────────────────────── */
-  --sn-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
-  --sn-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
-  --sn-shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.18);
-  --sn-overlay: rgba(0, 0, 0, 0.35);
-  --sn-primary-glow: rgba(59, 130, 246, 0.15);
-  --sn-primary-glow-strong: rgba(59, 130, 246, 0.35);
+  --app-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --app-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --app-shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.18);
+  --app-overlay: rgba(0, 0, 0, 0.35);
+  --app-primary-glow: rgba(59, 130, 246, 0.15);
+  --app-primary-glow-strong: rgba(59, 130, 246, 0.35);
 }
