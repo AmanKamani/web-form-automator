@@ -1,0 +1,143 @@
+:root {
+  /* ── Text ────────────────────────────────────────────── */
+  --sn-text-primary: #1e293b;
+  --sn-text-secondary: #475569;
+  --sn-text-muted: #64748b;
+  --sn-text-faint: #94a3b8;
+  --sn-text-heading: #0f172a;
+  --sn-text-on-primary: #fff;
+  --sn-text-strong: #334155;
+
+  /* ── Surfaces ────────────────────────────────────────── */
+  --sn-bg-page: #f8fafc;
+  --sn-bg-page-alt: #f1f5f9;
+  --sn-bg-surface: #fff;
+  --sn-bg-raised: #fafbfc;
+  --sn-bg-hover: #f1f5f9;
+  --sn-bg-toast: #1e293b;
+
+  /* ── Borders ─────────────────────────────────────────── */
+  --sn-border-default: #e2e8f0;
+  --sn-border-input: #cbd5e1;
+  --sn-border-subtle: #d1d5db;
+
+  /* ── Primary (blue) ──────────────────────────────────── */
+  --sn-primary: #3b82f6;
+  --sn-primary-hover: #2563eb;
+  --sn-primary-dark: #1d4ed8;
+  --sn-primary-light: #dbeafe;
+  --sn-primary-lighter: #eff6ff;
+  --sn-primary-border: #93c5fd;
+  --sn-primary-border-light: #bfdbfe;
+
+  /* ── Danger (red) ────────────────────────────────────── */
+  --sn-danger: #ef4444;
+  --sn-danger-hover: #dc2626;
+  --sn-danger-light: #fef2f2;
+  --sn-danger-border: #fca5a5;
+
+  /* ── Success (green) ─────────────────────────────────── */
+  --sn-success: #10b981;
+  --sn-success-alt: #22c55e;
+  --sn-success-light: #dcfce7;
+  --sn-success-lighter: #f0fdf4;
+  --sn-success-text: #166534;
+  --sn-success-text-dark: #065f46;
+  --sn-success-border: #6ee7b7;
+
+  /* ── Warning (amber) ─────────────────────────────────── */
+  --sn-warning: #f59e0b;
+  --sn-warning-light: #fef3c7;
+  --sn-warning-lighter: #fffbeb;
+  --sn-warning-text: #92400e;
+  --sn-warning-border: #fcd34d;
+
+  /* ── Info (sky / cyan) ───────────────────────────────── */
+  --sn-info: #0ea5e9;
+  --sn-info-light: #f0f9ff;
+  --sn-info-lighter: #e0f2fe;
+  --sn-info-border: #bae6fd;
+  --sn-info-border-light: #7dd3fc;
+  --sn-info-text: #075985;
+  --sn-info-accent: #38bdf8;
+
+  /* ── Purple ──────────────────────────────────────────── */
+  --sn-purple: #8b5cf6;
+  --sn-purple-light: #ede9fe;
+  --sn-purple-lighter: #f5f3ff;
+  --sn-purple-text: #5b21b6;
+  --sn-purple-border: #c4b5fd;
+
+  /* ── Indigo ──────────────────────────────────────────── */
+  --sn-indigo: #6366f1;
+  --sn-indigo-light: #eef2ff;
+  --sn-indigo-text: #3730a3;
+  --sn-indigo-border: #a5b4fc;
+
+  /* ── Orange ──────────────────────────────────────────── */
+  --sn-orange: #f97316;
+  --sn-orange-light: #fff7ed;
+  --sn-orange-text: #c2410c;
+  --sn-orange-border: #fdba74;
+
+  /* ── Field-type tokens ───────────────────────────────── */
+  --sn-type-button-bg: var(--sn-warning-light);
+  --sn-type-button-text: var(--sn-warning-text);
+  --sn-type-button-border: var(--sn-warning-border);
+  --sn-type-button-accent: var(--sn-warning);
+  --sn-type-button-light: var(--sn-warning-lighter);
+
+  --sn-type-expand-bg: var(--sn-purple-light);
+  --sn-type-expand-text: var(--sn-purple-text);
+  --sn-type-expand-border: var(--sn-purple-border);
+  --sn-type-expand-accent: var(--sn-purple);
+  --sn-type-expand-light: var(--sn-purple-lighter);
+
+  --sn-type-typeahead-bg: var(--sn-info-lighter);
+  --sn-type-typeahead-text: var(--sn-info-text);
+  --sn-type-typeahead-border: var(--sn-info-border-light);
+  --sn-type-typeahead-accent: var(--sn-info-accent);
+
+  --sn-type-text-bg: #ecfdf5;
+  --sn-type-text-text: var(--sn-success-text-dark);
+  --sn-type-text-border: var(--sn-success-border);
+  --sn-type-text-accent: var(--sn-success);
+
+  --sn-type-choice-bg: var(--sn-indigo-light);
+  --sn-type-choice-text: var(--sn-indigo-text);
+  --sn-type-choice-border: var(--sn-indigo-border);
+  --sn-type-choice-accent: var(--sn-indigo);
+
+  --sn-type-dialog-bg: var(--sn-orange-light);
+  --sn-type-dialog-text: var(--sn-orange-text);
+  --sn-type-dialog-border: var(--sn-orange-border);
+  --sn-type-dialog-accent: var(--sn-orange);
+
+  /* ── Section icon colors ─────────────────────────────── */
+  --sn-icon-templates: var(--sn-primary);
+  --sn-icon-flows: var(--sn-purple);
+  --sn-icon-payload: var(--sn-success);
+  --sn-icon-field-config: var(--sn-warning);
+  --sn-icon-start-url: var(--sn-info);
+  --sn-icon-error-handling: var(--sn-danger);
+  --sn-icon-flow-templates: var(--sn-indigo);
+
+  /* ── Font sizes ──────────────────────────────────────── */
+  --sn-font-xs: 10px;
+  --sn-font-sm: 11px;
+  --sn-font-base: 13px;
+  --sn-font-md: 14px;
+  --sn-font-lg: 15px;
+  --sn-font-xl: 16px;
+  --sn-font-2xl: 18px;
+  --sn-font-icon: 48px;
+  --sn-font-badge: 12px;
+
+  /* ── Shadows / glows ─────────────────────────────────── */
+  --sn-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --sn-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --sn-shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.18);
+  --sn-overlay: rgba(0, 0, 0, 0.35);
+  --sn-primary-glow: rgba(59, 130, 246, 0.15);
+  --sn-primary-glow-strong: rgba(59, 130, 246, 0.35);
+}
