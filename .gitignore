@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Build / Pack
+*.crx
+*.pem
+*.zip
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Husky internals (auto-generated on npm install)
+.husky/_/
+
+# Test coverage
+coverage/

@@ -1,0 +1,17 @@
+{
+  "name": "web-form-automator",
+  "private": true,
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepare": "husky"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "jsdom": "^24.1.3",
+    "vitest": "^2.1.9"
+  }
+}

@@ -177,3 +177,20 @@ function buildDataTemplate(fieldConfigs, targetName, targetType) {
     data: [placeholder],
   };
 }
+
+if (typeof module !== "undefined") {
+  module.exports = {
+    CONFIG_VERSION,
+    slugify,
+    generateKey,
+    copyName,
+    getExtensionVersion,
+    downloadJson,
+    buildTemplateShareExport,
+    buildFlowShareExport,
+    parseShareImport,
+    findDuplicateTemplate,
+    findDuplicateFlow,
+    buildDataTemplate,
+  };
+}

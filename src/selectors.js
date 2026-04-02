@@ -99,3 +99,14 @@ function findByPlaceholder(matchTexts, exclude) {
 
   return null;
 }
+
+if (typeof module !== "undefined") {
+  module.exports = {
+    FIELD_STRATEGIES,
+    findFieldByCfg,
+    findByLabelFor,
+    findByAriaLabel,
+    findByPlaceholder,
+    detectWidget,
+  };
+}

@@ -90,3 +90,12 @@ async function loadOrMigrateStorage() {
 
   return { ...data, ...updates };
 }
+
+if (typeof module !== "undefined") {
+  module.exports = {
+    STORAGE_KEYS,
+    DEFAULT_FIELD_CONFIGS,
+    EMPTY_PAYLOAD,
+    loadOrMigrateStorage,
+  };
+}
