@@ -333,11 +333,13 @@ function renderPayloadForm() {
     const isMulti = cfg.fieldType === "typeahead";
     const isButton = cfg.fieldType === "button";
     const isExpand = cfg.fieldType === "expand";
+    const isDialog = cfg.fieldType === "dialog";
 
-    if (isButton || isExpand) {
+    if (isButton || isExpand || isDialog) {
       const row = document.createElement("div");
-      row.className = "payload-row payload-action-row" + (isButton ? " payload-action-button" : " payload-action-expand");
-      const badge = isButton ? "Button" : "Expand";
+      const actionClass = isButton ? " payload-action-button" : isExpand ? " payload-action-expand" : " payload-action-dialog";
+      row.className = "payload-row payload-action-row" + actionClass;
+      const badge = isButton ? "Button" : isExpand ? "Expand" : "Dialog";
       row.innerHTML = `<span class="payload-action-badge">${badge}</span><span class="payload-action-label">${esc(label)}</span>`;
       container.appendChild(row);
       return;
@@ -394,7 +396,7 @@ function handlePayloadInput(e) {
 function readPayloadFromForm() {
   const result = {};
   fieldConfigs.forEach((cfg) => {
-    if (cfg.fieldType === "button" || cfg.fieldType === "expand") return;
+    if (cfg.fieldType === "button" || cfg.fieldType === "expand" || cfg.fieldType === "dialog") return;
     const key = cfg.key;
     let raw = payloadValues[key] || "";
     if (!raw && cfg.defaultValue) raw = cfg.defaultValue;
@@ -417,8 +419,8 @@ function renderFieldList() {
   container.innerHTML = "";
 
   fieldConfigs.forEach((cfg, idx) => {
-    const isAction = cfg.fieldType === "button" || cfg.fieldType === "expand";
-    const typeClassMap = { button: "field-item-button", expand: "field-item-expand", typeahead: "field-item-input", text: "field-item-input", choice: "field-item-input" };
+    const isAction = cfg.fieldType === "button" || cfg.fieldType === "expand" || cfg.fieldType === "dialog";
+    const typeClassMap = { button: "field-item-button", expand: "field-item-expand", dialog: "field-item-dialog", typeahead: "field-item-input", text: "field-item-input", choice: "field-item-input" };
     const typeClass = typeClassMap[cfg.fieldType] || "field-item-input";
     const item = document.createElement("div");
     item.className = "field-item" + (cfg.enabled === false ? " disabled-field" : "") + (typeClass ? " " + typeClass : "");
@@ -426,6 +428,7 @@ function renderFieldList() {
     const typeBadgeMap = {
       button: '<span class="field-type-badge badge-button">Action: Button</span>',
       expand: '<span class="field-type-badge badge-expand">Action: Expand</span>',
+      dialog: '<span class="field-type-badge badge-dialog">Action: Dialog</span>',
       typeahead: '<span class="field-type-badge badge-input">Input: Typeahead</span>',
       text: '<span class="field-type-badge badge-input">Input: Text</span>',
       choice: '<span class="field-type-badge badge-input">Input: Choice</span>',
@@ -447,7 +450,7 @@ function renderFieldList() {
           <label title="Friendly name shown in the UI and console logs. For buttons: the visible button text to find and click.">Display Name</label>
           <input type="text" data-field="displayName" data-idx="${idx}" value="${esc(cfg.displayName)}">
         </div>
-        <div class="full-width" style="${cfg.fieldType === "button" ? "display:none" : ""}">
+        <div class="full-width" style="${(cfg.fieldType === "button" || cfg.fieldType === "dialog") ? "display:none" : ""}">
           <label title="Text to match against visible elements on the ServiceNow page. For expand: matches link/toggle text. Can be the full label or a unique partial fragment. Multiple values are comma-separated — any match wins.">Label Match <small>(full label or partial text, comma-separated)</small></label>
           <input type="text" data-field="labelMatch" data-idx="${idx}" value="${esc((cfg.labelMatch || []).join(", "))}">
         </div>
@@ -459,13 +462,14 @@ function renderFieldList() {
             <option value="choice" ${cfg.fieldType === "choice" ? "selected" : ""}>Choice (native select)</option>
             <option value="button" ${cfg.fieldType === "button" ? "selected" : ""}>Button (click)</option>
             <option value="expand" ${cfg.fieldType === "expand" ? "selected" : ""}>Expand (toggle section)</option>
+            <option value="dialog" ${cfg.fieldType === "dialog" ? "selected" : ""}>Dialog (alert)</option>
           </select>
         </div>
-        <div class="timeout-field" style="${(cfg.fieldType === "text" || cfg.fieldType === "button" || cfg.fieldType === "expand") ? "display:none" : ""}">
+        <div class="timeout-field" style="${(cfg.fieldType === "text" || cfg.fieldType === "button" || cfg.fieldType === "expand" || cfg.fieldType === "dialog") ? "display:none" : ""}">
           <label title="How long (ms) to wait after typing for AJAX search results to load. Slow fields like member lookup may need 5000–10000ms. Max: 60000ms.">Search Wait <small>(ms, max 60s)</small></label>
           <input type="number" data-field="ajaxWait" data-idx="${idx}" value="${cfg.ajaxWait || 1500}" min="500" max="60000" step="500">
         </div>
-        <div class="timeout-field" style="${(cfg.fieldType === "text" || cfg.fieldType === "button" || cfg.fieldType === "expand") ? "display:none" : ""}">
+        <div class="timeout-field" style="${(cfg.fieldType === "text" || cfg.fieldType === "button" || cfg.fieldType === "expand" || cfg.fieldType === "dialog") ? "display:none" : ""}">
           <label title="After the search wait, how many times to poll for dropdown items (~400ms each). More retries = more time for slow-rendering results. e.g. 15 retries ≈ 6s of polling.">Dropdown Retries</label>
           <input type="number" data-field="dropdownRetries" data-idx="${idx}" value="${cfg.dropdownRetries || 15}" min="1" step="1">
         </div>
@@ -482,7 +486,7 @@ function renderFieldList() {
           <label title="How long (ms) to wait after clicking the button.">Wait Duration <small>(ms)</small></label>
           <input type="number" data-field="buttonWaitMs" data-idx="${idx}" value="${cfg.buttonWaitMs || 3000}" min="500" max="60000" step="500">
         </div>
-        <div class="full-width default-value-field" style="${(cfg.fieldType === "expand" || cfg.fieldType === "button") ? "display:none" : ""}">
+        <div class="full-width default-value-field" style="${(cfg.fieldType === "expand" || cfg.fieldType === "button" || cfg.fieldType === "dialog") ? "display:none" : ""}">
           <label title="Pre-filled value used when no payload value is provided. Also used as placeholder in exported JSON.">Default Value</label>
           <input type="text" data-field="defaultValue" data-idx="${idx}" value="${esc(cfg.defaultValue || "")}">
         </div>

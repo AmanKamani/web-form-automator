@@ -111,6 +111,14 @@
         continue;
       }
 
+      // ── Dialog field type — arm the MAIN world interceptor for alert ──
+      if (cfg.fieldType === "dialog") {
+        reportStep(`[${i + 1}/${fieldConfigs.length}] Arming alert interceptor — will auto-dismiss next alert.`, "step");
+        window.postMessage({ type: "__SN_SET_DIALOG_CONFIG", dialogAction: "ok" }, "*");
+        await sleep(50);
+        continue;
+      }
+
       // ── Button field type — find and click a button by its text ──
       if (cfg.fieldType === "button") {
         const btnText = cfg.displayName || cfg.key;
@@ -120,12 +128,58 @@
         }
         reportStep(`[${i + 1}/${fieldConfigs.length}] Clicking button "${btnText}"...`, "step");
 
+        // Look ahead: if the next field is a dialog, arm the interceptor BEFORE clicking
+        const nextCfg = fieldConfigs[i + 1];
+        let dialogArmed = false;
+        if (nextCfg && nextCfg.fieldType === "dialog") {
+          reportStep(`  Pre-arming dialog interceptor (next field is dialog)...`, "step");
+          window.postMessage({ type: "__SN_SET_DIALOG_CONFIG", dialogAction: "ok" }, "*");
+          await sleep(50);
+          dialogArmed = true;
+        }
+
         const waitMode = cfg.buttonWait || "smart_wait";
         const urlBefore = window.location.href;
 
         const btn = await waitForButton(btnText);
+
+        // If dialog is armed, set up the interception listener BEFORE clicking
+        // (click triggers alert synchronously; postMessage from interceptor fires during click)
+        let dialogInterceptionPromise = null;
+        if (dialogArmed) {
+          dialogInterceptionPromise = new Promise((resolve) => {
+            let done = false;
+            const timer = setTimeout(() => {
+              if (!done) {
+                done = true;
+                reportStep(`  Dialog interceptor: no alert detected within timeout — continuing.`, "step");
+                resolve();
+              }
+            }, 2000);
+            const handler = (e) => {
+              if (e.data && e.data.type === "__SN_DIALOG_INTERCEPTED") {
+                window.removeEventListener("message", handler);
+                clearTimeout(timer);
+                if (!done) {
+                  done = true;
+                  reportStep(`  Alert auto-dismissed: "${e.data.message}"`, "step");
+                  resolve();
+                }
+              }
+            };
+            window.addEventListener("message", handler);
+          });
+        }
+
         simulateClick(btn);
         reportStep(`  Clicked button "${btnText}".`);
+
+        if (dialogArmed) {
+          await dialogInterceptionPromise;
+          window.postMessage({ type: "__SN_CLEAR_DIALOG_CONFIG" }, "*");
+          i++; // skip the next dialog field since we already handled it
+          continue;
+        }
 
         if (waitMode === "no_wait") {
           await sleep(300);
@@ -139,16 +193,16 @@
           reportStep(`  URL changed.`);
         } else {
           // smart_wait: wait for next field's label or button text to appear
-          const nextCfg = fieldConfigs[i + 1];
-          if (nextCfg) {
-            if (nextCfg.fieldType === "button") {
-              const nextBtnText = nextCfg.displayName || nextCfg.key;
+          const nextSmartCfg = fieldConfigs[i + 1];
+          if (nextSmartCfg) {
+            if (nextSmartCfg.fieldType === "button") {
+              const nextBtnText = nextSmartCfg.displayName || nextSmartCfg.key;
               reportStep(`  Smart wait: waiting for button "${nextBtnText}"...`);
               await waitForButton(nextBtnText, 50);
               reportStep(`  Next button found.`);
-            } else if (nextCfg.labelMatch && nextCfg.labelMatch.length > 0) {
-              reportStep(`  Smart wait: waiting for label "${nextCfg.labelMatch[0]}"...`);
-              await waitForLabel(nextCfg.labelMatch, 30000);
+            } else if (nextSmartCfg.labelMatch && nextSmartCfg.labelMatch.length > 0) {
+              reportStep(`  Smart wait: waiting for label "${nextSmartCfg.labelMatch[0]}"...`);
+              await waitForLabel(nextSmartCfg.labelMatch, 30000);
               reportStep(`  Next field label found.`);
             } else {
               await sleep(2000);

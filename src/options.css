@@ -606,6 +606,12 @@ textarea { resize: vertical; }
   border: 1px solid #7dd3fc;
 }
 
+.badge-dialog {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #fdba74;
+}
+
 .field-item-input {
   border-left: 3px solid #38bdf8;
 }
@@ -616,6 +622,10 @@ textarea { resize: vertical; }
 
 .field-item-expand {
   border-left: 3px solid #8b5cf6;
+}
+
+.field-item-dialog {
+  border-left: 3px solid #f97316;
 }
 
 /* ── Payload action indicator rows ───────────────────── */
@@ -658,6 +668,16 @@ textarea { resize: vertical; }
 .payload-action-expand .payload-action-badge {
   background: #ede9fe;
   color: #5b21b6;
+}
+
+.payload-action-dialog {
+  background: #fff7ed;
+  border: 1px dashed #f97316;
+}
+
+.payload-action-dialog .payload-action-badge {
+  background: #fff7ed;
+  color: #c2410c;
 }
 
 .payload-action-label {
