@@ -1,12 +1,12 @@
 {
   "manifest_version": 3,
-  "name": "ServiceNow Group Join Automator",
+  "name": "Web Form Automator",
   "version": "1.0.0",
-  "description": "Automates AD group join/remove requests on ServiceNow portals.",
+  "description": "Config-driven automation for web forms — fill fields, click buttons, handle dialogs.",
   "permissions": ["activeTab", "storage", "scripting", "sidePanel"],
-  "host_permissions": ["https://*.service-now.com/*", "https://*/*", "http://*/*"],
+  "host_permissions": ["https://*/*", "http://*/*"],
   "action": {
-    "default_title": "Open SN Group Join panel",
+    "default_title": "Open Web Form Automator",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",

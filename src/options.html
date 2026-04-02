@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SN Group Join — Settings</title>
+  <title>Web Form Automator — Settings</title>
   <link rel="stylesheet" href="options.css">
 </head>
 <body>
   <header class="top-bar">
-    <h1>ServiceNow Group Join Automator</h1>
+    <h1>Web Form Automator</h1>
     <div class="top-bar-right">
       <a id="reloadExtLink" href="#" class="reload-ext-link" title="Open Chrome extensions page to reload">Reload Extension</a>
       <label class="domain-label">Domain</label>
-      <input type="text" id="domain" class="domain-input" placeholder="mycompany.service-now.com">
+      <input type="text" id="domain" class="domain-input" placeholder="mycompany.example.com">
     </div>
   </header>
 
@@ -88,7 +88,7 @@
           <details class="field-help">
             <summary>What are Search Wait &amp; Dropdown Retries?</summary>
             <div class="field-help-body">
-              <p><strong>Search Wait</strong> — After typing into a dropdown, ServiceNow makes an AJAX call to search. This is how long (in ms) to wait for results to appear. Slow fields (like member lookup) may need 5000–10000ms. Max: 60 seconds.</p>
+              <p><strong>Search Wait</strong> — After typing into a dropdown, the page may make an AJAX call to search. This is how long (in ms) to wait for results to appear. Slow fields may need 5000–10000ms. Max: 60 seconds.</p>
               <p><strong>Dropdown Retries</strong> — After the search wait, the extension polls for dropdown items to click. Each retry waits ~400ms. If results are slow to render, increase this. e.g. 15 retries = ~6s of polling after the initial wait.</p>
               <p class="field-help-example">Total max wait = Search Wait + (Retries × 400ms)<br>e.g. 10000ms wait + 30 retries = 10s + 12s = 22s total</p>
             </div>
@@ -112,7 +112,7 @@
         <section class="editor-section">
           <h3 data-section-icon="start-url">Start URL</h3>
           <p class="hint">The page to navigate to before each request in a batch (e.g. the "New Request" page URL).</p>
-          <input type="text" id="flowStartUrl" placeholder="https://mycompany.service-now.com/sp?id=sc_cat_item&sys_id=...">
+          <input type="text" id="flowStartUrl" placeholder="https://mycompany.example.com/form?id=...">
           <label class="flow-toggle" title="When ON, navigates to Start URL before every request including the first. When OFF, skips navigation for the first request (assumes you're already on the page).">
             <input type="checkbox" id="flowAlwaysNavigate" checked>
             Always navigate to Start URL (including first request)

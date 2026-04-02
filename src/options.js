@@ -241,7 +241,7 @@ function updateHowItWorks() {
       <h4>Getting Started</h4>
       <ol class="how-list">
         <li>Click <strong>+ New</strong> under Templates to create a template</li>
-        <li>Configure fields to match your ServiceNow page</li>
+        <li>Configure fields to match your target page</li>
         <li>Optionally, create a <strong>Flow</strong> to chain templates for multi-page or batch automation</li>
       </ol>`;
   }
@@ -551,7 +551,7 @@ function renderFieldList() {
           <input type="text" data-field="displayName" data-idx="${idx}" value="${esc(cfg.displayName)}">
         </div>
         <div class="full-width" style="${(cfg.fieldType === "button" || cfg.fieldType === "dialog") ? "display:none" : ""}">
-          <label title="Text to match against visible elements on the ServiceNow page. For expand: matches link/toggle text. Can be the full label or a unique partial fragment. Multiple values are comma-separated — any match wins.">Label Match <small>(full label or partial text, comma-separated)</small></label>
+          <label title="Text to match against visible elements on the target page. For expand: matches link/toggle text. Can be the full label or a unique partial fragment. Multiple values are comma-separated — any match wins.">Label Match <small>(full label or partial text, comma-separated)</small></label>
           <input type="text" data-field="labelMatch" data-idx="${idx}" value="${esc((cfg.labelMatch || []).join(", "))}">
         </div>
         <div class="timeout-field" style="${(cfg.fieldType === "text" || cfg.fieldType === "button" || cfg.fieldType === "expand" || cfg.fieldType === "dialog") ? "display:none" : ""}">

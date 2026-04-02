@@ -307,7 +307,7 @@
           reject(new Error(
             `Could not find field "${name}" after ${MAX_RETRIES} retries.\n` +
             `  labelMatch: ${JSON.stringify(cfg.labelMatch)}\n` +
-            `Verify the label text in Options matches the text on the SN page.`
+            `Verify the label text in Options matches the text on the target page.`
           ));
           return;
         }
@@ -706,7 +706,7 @@
         if (attempt >= retries) {
           reject(new Error(
             `Expand trigger not found for matches: ${JSON.stringify(matchTexts)}.\n` +
-            `Verify the label text in Options matches visible text on the SN page.`
+            `Verify the label text in Options matches visible text on the target page.`
           ));
           return;
         }
